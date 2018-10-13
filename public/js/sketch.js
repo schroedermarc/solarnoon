@@ -21,8 +21,13 @@ mapCoords = {
 let sunrise;
 let sunset;
 
+let font,
+  fontsize = 200;
+
+
 function preload() {
   worldMapImg = loadImage("/assets/worldMap.jpg");
+  font = loadFont('../assets/ArialUnicode.ttf');
 
 }
 
@@ -36,11 +41,26 @@ function setup() {
   mapCoords.minY = 50;
   mapCoords.maxY = 350;
 
+  textFont(font);
+  textSize(fontsize);
+  textAlign(CENTER, CENTER);
+
 }
 
 
 function draw() {
-  background(255);
+  // background(255);
+
+  var color1 = color(242, 249, 253);
+  var color2 = color(245, 207, 192);
+  setGradient(0, 0, windowWidth, windowHeight, color1, color2, "Y");
+
+  textAlign(LEFT);
+  drawSun(width * .6);
+  textAlign(RIGHT);
+  drawMoon(width * .4);
+
+
   image(worldMapImg, width / 2, 200, 400, 300);
 
   fill(mapMarkerDetails.color);
@@ -102,4 +122,39 @@ function getSunData() {
     console.log(sunrise);
 
   });
+}
+
+function setGradient(x, y, w, h, c1, c2, axis) {
+  noFill();
+  if (axis == "Y") { // Top to bottom gradient
+    for (let i = y; i <= y + h; i++) {
+      var inter = map(i, y, y + h, 0, 1);
+      var c = lerpColor(c1, c2, inter);
+      stroke(c);
+      line(x, i, x + w, i);
+    }
+  } else if (axis == "X") { // Left to right gradient
+    for (let j = x; j <= x + w; j++) {
+      var inter2 = map(j, x, x + w, 0, 1);
+      var d = lerpColor(c1, c2, inter2);
+      stroke(d);
+      line(j, y, j, y + h);
+    }
+  }
+}
+
+function drawSun(x) {
+  fill(236, 235, 138);
+  stroke(242, 249, 253);
+  strokeWeight(2);
+  text("☼", x, 450);
+
+}
+
+function drawMoon(x) {
+  fill(236, 215, 226);
+  stroke(242, 249, 253);
+  strokeWeight(2);
+  text("☾", x, 450);
+
 }
