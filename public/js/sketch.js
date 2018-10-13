@@ -25,6 +25,15 @@ let font,
   fontsize = 200;
 
 
+let daytime = true;
+
+let sunDownAmount = 0;
+let moonDownAmount = 0;
+
+
+
+
+
 function preload() {
   worldMapImg = loadImage("/assets/worldMap.jpg");
   font = loadFont('../assets/ArialUnicode.ttf');
@@ -32,7 +41,7 @@ function preload() {
 }
 
 function setup() {
-  createCanvas(window.innerWidth, window.innerHeight);
+  createCanvas(window.innerWidth, 2000);
 
   imageMode(CENTER);
 
@@ -53,16 +62,26 @@ function draw() {
 
   var color1 = color(242, 249, 253);
   var color2 = color(245, 207, 192);
-  setGradient(0, 0, windowWidth, windowHeight, color1, color2, "Y");
+  setGradient(0, 0, windowWidth, 2000, color1, color2, "Y");
+
+
+  if (daytime) {
+    sunDownAmount = 0;
+    moonDownAmount = 1200;
+  } else {
+    sunDownAmount = 1200;
+    moonDownAmount = 0;
+  }
 
   textAlign(LEFT);
-  drawSun(width * .6);
+  drawSun(450 + sunDownAmount);
   textAlign(RIGHT);
-  drawMoon(width * .4);
+  drawMoon(450 + moonDownAmount);
 
 
   image(worldMapImg, width / 2, 200, 400, 300);
 
+  stroke("black")
   fill(mapMarkerDetails.color);
   ellipse(mapMarkerDetails.x, mapMarkerDetails.y, 10, 10);
 
@@ -77,20 +96,17 @@ function mouseClicked() {
 
   if (mouseX >= mapCoords.minX && mouseX <= mapCoords.maxX && mouseY >= mapCoords.minY && mouseY <= mapCoords.maxY) {
 
-    // y = latitude
-    // x = longitude
-
-
 
     mapMarkerDetails.x = mouseX;
     mapMarkerDetails.y = mouseY;
-
-    // console.log(mouseX, mouseY);
 
     selectedCoords.lat = (map(mouseY, mapCoords.minY, mapCoords.maxY, 83, -75));
     selectedCoords.long = (map(mouseX, mapCoords.minX, mapCoords.maxX, -180, 180));
 
     getSunData();
+
+
+
 
   }
 
@@ -114,12 +130,40 @@ function getSunData() {
     // console.log('getting sun data', sunData.results);
 
 
-    sunset = sunData.results.sunset;
-    sunrise = sunData.results.sunrise;
+    sunset = new Date(sunData.results.sunset);
+    sunrise = new Date(sunData.results.sunrise);
 
 
-    console.log(sunset);
     console.log(sunrise);
+    console.log(sunset);
+
+
+
+    // let now = new Date().now();
+
+    let millisUntilSunset = sunset - Date.now();
+    console.log("time until sunset: " + millisUntilSunset);
+
+    let millisSinceSunrise = Date.now();
+    console.log("time since sunrise: " + millisSinceSunrise);
+
+
+
+    if (millisUntilSunset > 0) {
+      daytime = true;
+    } else {
+      daytime = false;
+    }
+
+
+
+
+    // console.log(now - sunrise);
+    // console.log("time until sunset: " + sunset - now);
+
+
+
+
 
   });
 }
@@ -143,18 +187,18 @@ function setGradient(x, y, w, h, c1, c2, axis) {
   }
 }
 
-function drawSun(x) {
+function drawSun(y) {
   fill(236, 235, 138);
   stroke(242, 249, 253);
   strokeWeight(2);
-  text("☼", x, 450);
+  text("☼", width * 0.6, y);
 
 }
 
-function drawMoon(x) {
+function drawMoon(y) {
   fill(236, 215, 226);
   stroke(242, 249, 253);
   strokeWeight(2);
-  text("☾", x, 450);
+  text("☾", width * 0.4, y);
 
 }
